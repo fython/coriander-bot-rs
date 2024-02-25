@@ -5,7 +5,7 @@ mod rpt;
 use teloxide::Bot;
 use teloxide::prelude::*;
 use teloxide::types::{MediaKind, MediaText, MessageKind};
-use commands::*;
+use crate::commands::*;
 use crate::configs::BotConfigs;
 use crate::rpt::{REPEATER_STATES, RepeaterNextAction};
 
