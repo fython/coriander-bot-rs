@@ -46,3 +46,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Deploy for sb_2nd_bot instance
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.DEPLOY_WEBHOOK_CALLBACK_URL }}}
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: '${{ secrets.DEPLOY_WEBHOOK_CALLBACK_BODY }}'
