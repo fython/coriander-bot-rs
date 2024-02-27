@@ -9,6 +9,7 @@ pub(crate) enum Command {
 }
 
 pub(crate) async fn handle_help_cmd(bot: Bot, msg: Message, _: Command) -> ResponseResult<()> {
-    bot.send_message(msg.chat.id, "暂时还没有说明").await?;
+    bot.send_message(msg.chat.id, "我的主人很懒！！！不如直接问问他怎么用")
+        .await?;
     Ok(())
 }
