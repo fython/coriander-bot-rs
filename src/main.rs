@@ -1,13 +1,15 @@
 mod commands;
 mod configs;
+mod msgfmt;
 mod rpt;
+mod userinteract;
 
-use teloxide::Bot;
-use teloxide::prelude::*;
-use teloxide::types::{MediaKind, MediaText, MessageKind};
 use crate::commands::*;
 use crate::configs::BotConfigs;
-use crate::rpt::{REPEATER_STATES, RepeaterNextAction};
+use crate::rpt::{RepeaterNextAction, REPEATER_STATES};
+use teloxide::prelude::*;
+use teloxide::types::{MediaKind, MediaText, MessageKind};
+use teloxide::Bot;
 
 #[tokio::main]
 async fn main() {
@@ -48,14 +50,21 @@ async fn handle_cmd(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> 
 async fn handle_messages_in_any_groups(bot: Bot, msg: Message) -> ResponseResult<()> {
     log::debug!("receive group msg: text={:?}", msg.text());
 
-    if let MessageKind::Common(common) = msg.kind {
-        if let MediaKind::Text(MediaText { text, entities: _ }) = common.media_kind {
-            match REPEATER_STATES.get_next_action(msg.chat.id, text.clone()) {
-                RepeaterNextAction::Repeat => {
-                    log::info!("{} needs repeat", text.clone());
-                    bot.send_message(msg.chat.id, text).await?;
-                },
-                _ => (),
+    if let MessageKind::Common(common) = &msg.kind {
+        if let MediaKind::Text(MediaText { text, entities: _ }) = &common.media_kind {
+            if userinteract::handle_user_do_sth_to_another(&bot, &msg)
+                .await
+                .is_some()
+            {
+                return Ok(());
+            } else {
+                match REPEATER_STATES.get_next_action(msg.chat.id, text.clone()) {
+                    RepeaterNextAction::Repeat => {
+                        log::info!("{} needs repeat", text.clone());
+                        bot.send_message(msg.chat.id, text).await?;
+                    }
+                    _ => (),
+                }
             }
         }
     }
