@@ -54,9 +54,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+      - name: Set Versions
+        uses: actions/github-script@v4
+        id: set_version
+        with:
+          script: |
+            core.setOutput('ref_name_without_v', context.ref.replace('v', ''))
       - name: Deploy
         uses: WyriHaximus/github-action-helm3@v3
         with:
-          exec: helm upgrade coriander-bot-rs ./helm-chart/ --install --wait --atomic --namespace=${{ secrets.DEPLOY_HELM_NAMESPACE }} --set bot.token=${{ secrets.SB_GEN2_BOT_TOKEN }} --set image.tag=${{ github.ref_name }}
+          exec: helm upgrade coriander-bot-rs ./helm-chart/ --install --wait --atomic --namespace=${{ secrets.DEPLOY_HELM_NAMESPACE }} --set bot.token=${{ secrets.SB_GEN2_BOT_TOKEN }} --set image.tag=${{ steps.set_version.outputs.ref_name_without_v }}
           kubeconfig: '${{ secrets.SB_GEN2_BOT_KUBECONFIG }}'
           overrule_existing_kubeconfig: "true"
