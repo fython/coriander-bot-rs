@@ -59,7 +59,7 @@ jobs:
         id: set_version
         with:
           script: |
-            core.setOutput('ref_name_without_v', context.ref.replace('v', ''))
+            core.setOutput('ref_name_without_v', context.ref.replace('refs/tags/v', ''))
       - name: Deploy
         uses: WyriHaximus/github-action-helm3@v3
         with:
