@@ -1,17 +1,21 @@
+#
 name: Publish docker & deploy for sb_gen2_bot
 
+# Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
   push:
     tags:
       - 'v*'
 
+# Defines two custom environment variables for the workflow. These are used for the Container registry domain, and a name for the Docker image that this workflow builds.
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+# There is a single job in this workflow. It's configured to run on the latest available version of Ubuntu.
 jobs:
   build-and-push-image:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:
       contents: read
