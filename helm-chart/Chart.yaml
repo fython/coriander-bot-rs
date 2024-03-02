@@ -1,0 +1,10 @@
+apiVersion: v1
+name: coriander-bot-rs
+version: 1.0.0
+keywords:
+  - telegram
+maintainers:
+  - name: Siubeng
+sources:
+  - https://github.com/fython/coriander-bot-rs
+description: A telegram bot written in Rust

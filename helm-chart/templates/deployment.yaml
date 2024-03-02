@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deploy
+  labels:
+    app: coriander-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coriander-bot
+  template:
+    metadata:
+      labels:
+        app: coriander-bot
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-configmap
+          image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'
+          imagePullPolicy: {{ .Values.image.pullPolicy }}

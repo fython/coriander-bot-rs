@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  RUST_LOG: "{{ .Values.env.RUST_LOG }}"
+  TELOXIDE_TOKEN: "{{ .Values.bot.token }}"
+  CORIANDER_MAINTAINER_USER_ID: "{{ .Values.bot.maintainerUserId }}"

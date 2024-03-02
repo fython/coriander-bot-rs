@@ -1,0 +1,12 @@
+# 镜像配置
+image:
+  repository: ghcr.io/fython/coriander-bot-rs
+  tag: latest
+  pullPolicy: IfNotPresent
+# 机器人配置
+bot:
+  token: ""
+  maintainerUserId: 0
+# 其他环境变量
+env:
+  RUST_LOG: "info,std::option"
