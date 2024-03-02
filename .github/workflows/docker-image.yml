@@ -1,10 +1,9 @@
 #
-name: Create and publish a Docker image
+name: Publish docker & deploy for sb_gen2_bot
 
 # Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
   push:
-    branches: [ 'master' ]
     tags:
       - 'v*'
 
@@ -55,10 +54,9 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      - name: Deploy for sb_2nd_bot instance
-        uses: fjogeleit/http-request-action@v1
+      - name: Deploy
+        uses: WyriHaximus/github-action-helm3@v3
         with:
-          url: ${{ secrets.DEPLOY_WEBHOOK_CALLBACK_URL }}
-          method: 'POST'
-          customHeaders: '{"Content-Type": "application/json"}'
-          data: '${{ secrets.DEPLOY_WEBHOOK_CALLBACK_BODY }}'
+          exec: helm upgrade coriander-bot-rs ./helm-chart/ --install --wait --atomic --namespace=${{ secrets.DEPLOY_HELM_NAMESPACE }} --set bot.token=${{ secrets.SB_GEN2_BOT_TOKEN }} --set image.tag=${{ github.ref_name }}
+          kubeconfig: '${{ secrets.SB_GEN2_BOT_KUBECONFIG }}'
+          overrule_existing_kubeconfig: "true"
