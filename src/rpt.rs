@@ -26,8 +26,8 @@ pub(crate) struct RepeaterStates {
 pub(crate) static REPEATER_STATES: Lazy<RepeaterStates> = Lazy::new(|| {
     RepeaterStates {
         max_text_length: 3 * 10,
-        max_wait_repeat_duration: TimeDelta::seconds(15),
-        min_recent_repeat_duration: TimeDelta::seconds(30),
+        max_wait_repeat_duration: TimeDelta::seconds(45),
+        min_recent_repeat_duration: TimeDelta::seconds(120),
         groups: DashMap::new(),
     }
 });
