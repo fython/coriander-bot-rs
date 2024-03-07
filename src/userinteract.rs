@@ -19,17 +19,21 @@ pub(crate) async fn handle_user_do_sth_to_another(bot: &Bot, msg: &Message) -> O
         if act.is_none() {
             return None;
         }
-        let act = act.unwrap();
+        let acts: Vec<&str> = act.unwrap().split_ascii_whitespace().into_iter().collect();
+        if acts.len() == 0 || acts[0] == "me" {
+            return None;
+        }
+        let mut text = format!(
+            "{} {}了 {}",
+            markup_username_with_link(from_user.unwrap()),
+            acts[0],
+            markup_username_with_link(reply_user.unwrap())
+        );
+        if acts.len() > 1 {
+            text.push_str(&format!(" {}", acts[1]));
+        }
         let res = bot
-            .send_message(
-                msg.chat.id,
-                format!(
-                    "{} {}了 {}",
-                    markup_username_with_link(from_user.unwrap()),
-                    act,
-                    markup_username_with_link(reply_user.unwrap())
-                ),
-            )
+            .send_message(msg.chat.id, text)
             .parse_mode(ParseMode::MarkdownV2)
             .await;
         if res.is_err() {

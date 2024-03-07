@@ -61,7 +61,8 @@ async fn handle_messages_in_any_groups(bot: Bot, msg: Message) -> ResponseResult
                 match REPEATER_STATES.get_next_action(msg.chat.id, text.clone()) {
                     RepeaterNextAction::Repeat => {
                         log::info!("{} needs repeat", text.clone());
-                        bot.send_message(msg.chat.id, text).await?;
+                        bot.forward_message(msg.chat.id, msg.chat.id, msg.id)
+                            .await?;
                     }
                     _ => (),
                 }
