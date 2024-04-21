@@ -1,7 +1,6 @@
-use std::time::SystemTime;
 use chrono::{DateTime, TimeDelta, Utc};
 use dashmap::DashMap;
-use once_cell::sync::Lazy;
+use std::time::SystemTime;
 use teloxide::prelude::ChatId;
 
 /// 复读机状态
@@ -12,6 +11,7 @@ use teloxide::prelude::ChatId;
 /// 当群组内有小于 N 长度的文本消息在 M 时间间隔内重复出现第二次，则机器人复读一次，
 /// 并记录下复读发生的时间，在相同条件下距离上次复读发生的 R 时间间隔内不再复读，
 /// 直至超时。
+#[derive(Debug)]
 pub(crate) struct RepeaterStates {
     /// 复读文本的最大长度，超过此长度则不进行统计和复读
     pub max_text_length: u32,
@@ -23,24 +23,28 @@ pub(crate) struct RepeaterStates {
     pub groups: DashMap<ChatId, RepeaterGroupState>,
 }
 
-pub(crate) static REPEATER_STATES: Lazy<RepeaterStates> = Lazy::new(|| {
-    RepeaterStates {
-        max_text_length: 3 * 10,
-        max_wait_repeat_duration: TimeDelta::seconds(45),
-        min_recent_repeat_duration: TimeDelta::seconds(120),
-        groups: DashMap::new(),
-    }
-});
-
 impl RepeaterStates {
     pub fn get_next_action(&self, chat_id: ChatId, text: String) -> RepeaterNextAction {
         log::debug!("text.len(): {}", text.len());
         if text.len() > self.max_text_length as usize {
             return RepeaterNextAction::Nothing;
         }
-        self.groups.entry(chat_id)
-            .or_default()
-            .get_next_action(text, self.max_wait_repeat_duration, self.min_recent_repeat_duration)
+        self.groups.entry(chat_id).or_default().get_next_action(
+            text,
+            self.max_wait_repeat_duration,
+            self.min_recent_repeat_duration,
+        )
+    }
+}
+
+impl Default for RepeaterStates {
+    fn default() -> Self {
+        RepeaterStates {
+            max_text_length: 3 * 10,
+            max_wait_repeat_duration: TimeDelta::seconds(45),
+            min_recent_repeat_duration: TimeDelta::seconds(120),
+            groups: DashMap::new(),
+        }
     }
 }
 
@@ -59,9 +63,12 @@ impl Default for RepeaterGroupState {
 }
 
 impl RepeaterGroupState {
-    pub fn get_next_action(&self, text: String,
-                           max_wait_repeat_duration: TimeDelta,
-                           min_recent_repeat_duration: TimeDelta) -> RepeaterNextAction {
+    pub fn get_next_action(
+        &self,
+        text: String,
+        max_wait_repeat_duration: TimeDelta,
+        min_recent_repeat_duration: TimeDelta,
+    ) -> RepeaterNextAction {
         let now = DateTime::from(SystemTime::now());
         let mut state = self.text_states.entry(text).or_default();
         let mut res = RepeaterNextAction::Nothing;

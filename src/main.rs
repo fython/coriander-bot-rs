@@ -1,12 +1,16 @@
+mod app;
 mod commands;
 mod configs;
 mod msgfmt;
 mod rpt;
+mod urlenhance;
 mod userinteract;
 
+use crate::app::BotApp;
 use crate::commands::*;
 use crate::configs::BotConfigs;
-use crate::rpt::{RepeaterNextAction, REPEATER_STATES};
+use crate::rpt::RepeaterNextAction;
+use std::sync::Arc;
 use teloxide::prelude::*;
 use teloxide::types::{MediaKind, MediaText, MessageKind};
 use teloxide::Bot;
@@ -20,6 +24,11 @@ async fn main() {
     let bot_cfg = BotConfigs {
         bot_maintainer: UserId(0),
     };
+    app::set(BotApp {
+        repeater_state: Default::default(),
+        url_track_cleaner: Arc::new(urlenhance::default_cleaner()),
+    })
+    .await;
 
     let handlers = Update::filter_message()
         .branch(
@@ -44,6 +53,7 @@ async fn main() {
 async fn handle_cmd(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
     match cmd {
         Command::Help => handle_help_cmd(bot, msg, cmd).await,
+        Command::CleanUrl(cmd) => urlenhance::handle_clean_url_cmd(bot, msg, cmd).await,
     }
 }
 
@@ -58,7 +68,8 @@ async fn handle_messages_in_any_groups(bot: Bot, msg: Message) -> ResponseResult
             {
                 return Ok(());
             } else {
-                match REPEATER_STATES.get_next_action(msg.chat.id, text.clone()) {
+                let repeater_states = app::get().await.repeater_state;
+                match repeater_states.get_next_action(msg.chat.id, text.clone()) {
                     RepeaterNextAction::Repeat => {
                         log::info!("{} needs repeat", text.clone());
                         bot.forward_message(msg.chat.id, msg.chat.id, msg.id)

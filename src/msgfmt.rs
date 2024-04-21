@@ -7,3 +7,7 @@ pub(crate) fn markup_username_with_link(user: &User) -> String {
         &markdown::escape(&user.full_name()),
     )
 }
+
+pub(crate) fn plain_link(url: &str) -> String {
+    markdown::link(url, &markdown::escape(url))
+}
