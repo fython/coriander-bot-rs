@@ -27,14 +27,14 @@ pub(crate) async fn handle_clean_url_cmd(
     cmd: CleanUrlCommand,
 ) -> ResponseResult<()> {
     if let Some(replied) = &msg.reply_to_message().cloned() {
-        if let Some(text) = replied.text() {
-            return handle_clean_urls_in_text(bot, msg, text.clone()).await;
+        return if let Some(text) = replied.text() {
+            handle_clean_urls_in_text(bot, msg, text).await
         } else {
             bot.send_message(msg.chat.id, "无法处理此消息")
                 .reply_to_message_id(msg.id)
                 .await?;
-            return Ok(());
-        }
+            Ok(())
+        };
     }
     if cmd.url.is_empty() {
         bot.send_message(msg.chat.id, "URL 不能为空")

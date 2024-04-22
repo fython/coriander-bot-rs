@@ -1745,9 +1745,9 @@ dependencies = [
 
 [[package]]
 name = "url-track-cleaner"
-version = "0.1.3"
+version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58ece4daaa956919b83dd77d5c73dee850342934c29757c1cbbe05141bd90fdf"
+checksum = "9c0c6743da8d1f79ab97c34709e0b52d65f77fe324f7dc82e75b6bea883b9d2f"
 dependencies = [
  "anyhow",
  "regex",
