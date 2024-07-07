@@ -1,15 +1,14 @@
 mod app;
 mod commands;
 mod configs;
+mod features;
 mod msgfmt;
-mod rpt;
-mod urlenhance;
-mod userinteract;
 
 use crate::app::BotApp;
 use crate::commands::*;
 use crate::configs::BotConfigs;
-use crate::rpt::RepeaterNextAction;
+use features::rpt::RepeaterNextAction;
+use features::{urlenhance, userinteract};
 use std::sync::Arc;
 use teloxide::prelude::*;
 use teloxide::types::{MediaKind, MediaText, MessageKind};
@@ -54,6 +53,7 @@ async fn handle_cmd(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> 
     match cmd {
         Command::Help => handle_help_cmd(bot, msg, cmd).await,
         Command::CleanUrl(cmd) => urlenhance::handle_clean_url_cmd(bot, msg, cmd).await,
+        Command::Replace(cmd) => userinteract::handle_user_replace_words(&bot, &msg, cmd).await,
     }
 }
 
