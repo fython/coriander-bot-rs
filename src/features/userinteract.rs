@@ -1,9 +1,8 @@
 use crate::commands::ReplaceCommand;
 use crate::msgfmt::markup_username_with_link;
-use std::any::Any;
-use std::ptr::replace;
 use teloxide::prelude::*;
 use teloxide::types::{MediaKind, MediaText, MessageKind, ParseMode};
+use teloxide::utils::markdown::escape;
 
 /// 处理用户对另一个用户的模拟指令行为
 ///
@@ -75,7 +74,7 @@ pub(crate) async fn handle_user_replace_words(
             let from = msg.from().unwrap();
             let replaced = text.replace(&cmd.keyword, &cmd.replacement);
             let replacer = markup_username_with_link(from);
-            bot.send_message(msg.chat.id, format!("{} ：{}", replacer, replaced))
+            bot.send_message(msg.chat.id, format!("{} ：{}", replacer, escape(&replaced)))
                 .parse_mode(ParseMode::MarkdownV2)
                 .reply_to_message_id(msg.id)
                 .await?;
